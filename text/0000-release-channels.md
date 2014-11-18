@@ -8,7 +8,7 @@ This RFC describes changes to the Rust release process, primarily the
 division of Rust's time-based releases into 'release channels',
 following the 'release train' model used by e.g. Firefox and Chrome;
 as well as 'feature staging', which enables the continued development
-of experimental language features and libraries API's while providing
+of experimental language features and libraries APIs while providing
 strong stability guarantees in stable releases.
 
 # Motivation
@@ -74,7 +74,7 @@ point releases on the stable channel, the policy around which is yet
 undetermined.
 
 Builds of the 'nightly' channel are published every night based on the
-content of the beta branch. Each published build during a single
+content of the master branch. Each published build during a single
 development cycle carries *the same version number*,
 e.g. '1.0.0-nightly', though for debugging purposes rustc builds can
 be uniquely identified by reporting the commit number from which they
@@ -82,13 +82,18 @@ were built. As today, published nightly artifacts are simply referred
 to as 'rust-nightly' (not named after their version number). Artifacts
 produced from the nightly release channel should be considered
 transient, though we will maintain historical archives for convenience
-of projects that occassionally need to pin to specific revisions.
+of projects that occasionally need to pin to specific revisions.
 
 Builds of the 'beta' channel are published periodically as fixes are
 merged, and like the 'nightly' channel each published build during a
 single development cycle retains the same version number, but can be
 uniquely identified by the commit number. Beta artifacts are likewise
 simply named 'rust-beta'.
+
+We will ensure that it is convenient to perform continuous integration
+of Cargo packages against the beta channel on Travis CI. This will
+help detect any accidental breakage early, while not interfering with
+their build status.
 
 Stable builds are versioned and named the same as today's releases,
 both with just a bare version number, e.g. '1.0.0'.  They are
@@ -118,7 +123,7 @@ channel as 1.0.0 and beginning the release train process in full.
 
 In builds of Rust distributed through the 'beta' and 'stable' release
 channels, it is impossible to turn on experimental language features
-by writing the `#[feature(...)]` attribute or to use API's *from
+by writing the `#[feature(...)]` attribute or to use APIs *from
 libraries distributed as part of the main Rust distribution* tagged
 with either `#[experimental]` or `#[unstable]`. This is accomplished
 primarily through three new lints, `experimental_features`,
@@ -190,13 +195,14 @@ stable 1.0 release cannot be used in any practical sense it will be
 problematic from a PR perspective. Implementing this RFC will require
 careful attention to the libraries it affects.
 
-Recorgnizing this risk, we must put in place processes to monitor the
+Recognizing this risk, we must put in place processes to monitor the
 compatibility of known Cargo crates with the stable release channel,
 using evidence drawn from those crates to prioritize the stabilization
-of features and libraries. The details of this process are out of
-scope for this RFC.
+of features and libraries. This work has already begun, with popular
+feature gates being ungated, and library stabilization work being
+prioritized based on the needs of Cargo crates.
 
-Syntax extensions, lints, and any program using the compiler API's
+Syntax extensions, lints, and any program using the compiler APIs
 will not be compatible with the stable release channel at 1.0 since it
 is not possible to stabilize `#[plugin_registrar]` in time. Plugins
 are very popular. This pain will partially be alleviated by a proposed
@@ -207,7 +213,7 @@ are very popular. This pain will partially be alleviated by a proposed
 # Alternatives
 
 Leave feature gates and experimental APIs exposed to the stable
-channel, as precented by Haskell, web vendor prefixes, and node.js.
+channel, as precedented by Haskell, web vendor prefixes, and node.js.
 
 Make the beta channel a compromise between the nightly and stable
 channels, allowing some set of experimental features and APIs. This
